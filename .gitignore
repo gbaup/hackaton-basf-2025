@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# dotenv environment variables
+.env
+
+# Python metadata
+*.egg-info/
+*.eggs/
+dist/
+build/
+
+# Docker
+*.tar
+docker-compose.override.yml
+
+# Jupyter (por si llega a usarse)
+.ipynb_checkpoints/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# MongoDB volume (in case you ever dump)
+dump/
