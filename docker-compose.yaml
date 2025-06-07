@@ -5,7 +5,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - ./backend:/app
     depends_on:
       - mongo
     env_file:
@@ -17,6 +17,16 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - api
 
 volumes:
   mongodb_data:
