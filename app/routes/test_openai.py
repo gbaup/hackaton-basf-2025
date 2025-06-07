@@ -1,8 +1,11 @@
 import os
-from fastapi import APIRouter
+import json
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from openai import AzureOpenAI
 from dotenv import load_dotenv
+
+from app.models.evaluation import EvaluationResponse
 
 load_dotenv()
 
@@ -13,7 +16,7 @@ class ChatRequest(BaseModel):
     mensaje: str
 
 
-@router.post("/test-openai")
+@router.post("/test-openai", response_model=EvaluationResponse)
 def test_openai_endpoint(request: ChatRequest):
     client = AzureOpenAI(
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
@@ -27,7 +30,12 @@ def test_openai_endpoint(request: ChatRequest):
         messages=[
             {
                 "role": "system",
-                "content": "Sos un experto en seguridad industrial y prevención de riesgos químicos. Ayudás a evaluar riesgos en tareas de mantenimiento, inspección y manipulación de sustancias peligrosas en una planta. Tu evaluación es extremadamente importante, ya que un accidente no solo representa pérdidas economómicas para la empresa sino que puede también involucrar pérdidas humanas",
+                "content": (
+                    "Sos un experto en seguridad industrial y prevención de riesgos químicos. "
+                    "Tu respuesta debe estar en formato JSON con las claves: "
+                    "'riesgo_estimado', 'motivos' (lista), y 'sugerencias' (lista). "
+                    "Si el mensaje recibido es de otros temas, responde un mensaje explicando por qué no puedes ayudar con eso en formato de texto plano (no JSON). "
+                )
             },
             {
                 "role": "user",
@@ -42,6 +50,13 @@ def test_openai_endpoint(request: ChatRequest):
         presence_penalty=0.0
     )
 
-    return {
-        "respuesta_openai": response.choices[0].message.content
-    }
+    response_text = response.choices[0].message.content
+
+    try:
+        data = json.loads(response_text)
+        return EvaluationResponse(**data)
+    except Exception:
+        raise HTTPException(
+            status_code=422,
+            detail={"error": "Pregunta no váldia", "mensaje": response_text}
+        )

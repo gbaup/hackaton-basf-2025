@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import test_openai
+from app.routes import test_openai, test_roboflow
 
 app = FastAPI()
 
@@ -10,3 +10,4 @@ def read_root():
 
 
 app.include_router(test_openai.router)
+app.include_router(test_roboflow.router)

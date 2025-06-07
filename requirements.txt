@@ -3,3 +3,5 @@ uvicorn[standard]
 pymongo
 python-dotenv
 openai>=1.0.0
+requests
+python-multipart
