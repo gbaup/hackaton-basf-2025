@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 import random
+import os
 
 ZONAS = ["zona_A", "zona_B", "zona_C"]
 ETIQUETAS = ["inflamable", "corrosivo", "tóxico", "explosivo", "gas a presión"]
@@ -46,7 +47,7 @@ def generar_mock():
 
 def seed():
     print("🔄 Iniciando migración/Seeder de historial de mantenimientos...")
-    client = MongoClient("mongodb://mongo:27017")
+    client = MongoClient(os.getenv("MONGO_URL"))
     db = client["basf"]
     collection = db["historial_mantenimientos"]
 
@@ -56,6 +57,5 @@ def seed():
     collection.insert_many(registros)
     print("✅ Migración/Seeder completado.")
 
-
-if __name__ == "__main__":
-    seed()
+    if __name__ == "__main__":
+        seed()
