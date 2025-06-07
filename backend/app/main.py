@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
-from app.routes import test_openai, test_roboflow
+
+from app.services.risk_service import risk_evaluation
 
 app = FastAPI()
 
@@ -13,10 +14,6 @@ def read_root():
 async def predict(file: UploadFile = File(...)):
     contents = await file.read()
     try:
-        return predict_image(contents, file.content_type)
+        return risk_evaluation(contents, file.content_type)
     except Exception:
         return {"error": "Failed to process the image."}
-
-
-app.include_router(test_openai.router)
-app.include_router(test_roboflow.router)

@@ -5,9 +5,11 @@ API_KEY = os.getenv("ROBOFLOW_API_KEY")
 MODEL_ENDPOINT = os.getenv("ROBOFLOW_MODEL_ENDPOINT")
 
 
-def predict_image(contents: bytes, content_type: str):
+def ghs_labels_detection(contents: bytes, content_type: str):
     response = requests.post(
         f"{MODEL_ENDPOINT}?api_key={API_KEY}",
         files={"file": ("filename", contents, content_type)}
     )
-    return response.json()
+    result = response.json()
+    detected_classes = [pred["class"] for pred in result.get("predictions", [])]
+    return list(set(detected_classes))
