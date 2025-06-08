@@ -17,21 +17,16 @@ deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
 
 def evaluar_riesgo(mensaje: str) -> EvaluationResponse:
     try:
-        context_chunks = query_index(mensaje)
-        contexto_ghs = "\n\n".join(context_chunks)
-
         response = client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
                     "content": (
                         "Sos un experto en seguridad industrial y prevención de riesgos químicos. "
-                        "Tené en cuenta SERIAMENTE esta normativa del GHS para tu respuesta:\n\n"
-                        f"{contexto_ghs}\n\n"
                         "Tu respuesta debe estar en formato JSON con las claves: "
                         "'riesgo_estimado', 'motivos' (lista), y 'sugerencias' (lista). "
-                        "'riesgo_estimado' quiero que sea alto, medio o bajo, basandote en la norma GHS. "
-                        "Si el mensaje recibido es de otros temas, respondé por qué no podés ayudar con eso en texto plano."
+                        "'riesgo_estimado' debe ser uno de: alto, medio o bajo, basándote en la norma GHS. "
+                        "Si el mensaje recibido es de otros temas, respondé en texto plano por qué no podés ayudar con eso."
                     )
                 },
                 {
@@ -49,13 +44,14 @@ def evaluar_riesgo(mensaje: str) -> EvaluationResponse:
 
         response_text = response.choices[0].message.content
 
-        data = json.loads(response_text)
-        return EvaluationResponse(**data)
+        try:
+            data = json.loads(response_text)
+            return EvaluationResponse(**data)
+        except json.JSONDecodeError:
+            raise HTTPException(
+                status_code=422,
+                detail={"error": "Pregunta no válida", "mensaje": response_text}
+            )
 
-    except json.JSONDecodeError:
-        raise HTTPException(
-            status_code=422,
-            detail={"error": "Pregunta no válida", "mensaje": response_text}
-        )
     except Exception as e:
         raise HTTPException(status_code=500, detail={"error": str(e)})

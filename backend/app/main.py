@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 
 from pydantic import BaseModel
 from app.services.risk_service import risk_evaluation
@@ -13,10 +13,10 @@ def read_root():
 
 
 @app.post("/predict-risks")
-async def predict(file: UploadFile = File(...)):
+async def predict(file: UploadFile = File(...), zona: str = Form(...)):
     contents = await file.read()
     try:
-        return risk_evaluation(contents, file.content_type)
+        return risk_evaluation(contents, file.content_type, zona)
     except Exception:
         return {"error": "Failed to process the image."}
 

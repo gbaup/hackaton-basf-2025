@@ -12,7 +12,10 @@ if uploaded_file:
     with st.status("Enviando al backend...", expanded=False) as status:
         try:
             files = {"file": (uploaded_file.name, uploaded_file, uploaded_file.type)}
-            response = requests.post("http://api:8000/predict-risks", files=files)
+            data = {
+                "zona": "A"
+            }
+            response = requests.post("http://api:8000/predict-risks", files=files, data=data)
 
             st.subheader("🔍 Evaluación del riesgo:")
 
