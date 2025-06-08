@@ -6,3 +6,6 @@ openai>=1.0.0
 requests
 python-multipart
 streamlit
+faiss-cpu
+PyMuPDF
+numpy

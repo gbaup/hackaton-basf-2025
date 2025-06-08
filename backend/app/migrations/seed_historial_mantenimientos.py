@@ -57,5 +57,6 @@ def seed():
     collection.insert_many(registros)
     print("✅ Migración/Seeder completado.")
 
-    if __name__ == "__main__":
-        seed()
+
+if __name__ == "__main__":
+    seed()

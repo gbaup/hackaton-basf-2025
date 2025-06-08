@@ -1,6 +1,8 @@
 from fastapi import FastAPI, File, UploadFile
 
+from pydantic import BaseModel
 from app.services.risk_service import risk_evaluation
+from app.rag_system.rag_engine import generate_response
 
 app = FastAPI()
 
@@ -17,3 +19,13 @@ async def predict(file: UploadFile = File(...)):
         return risk_evaluation(contents, file.content_type)
     except Exception:
         return {"error": "Failed to process the image."}
+
+
+# NUEVO ENDPOINT RAG
+class GHSQuery(BaseModel):
+    question: str
+
+
+@app.post("/consulta-ghs")
+def consulta_ghs(query: GHSQuery):
+    return {"respuesta": generate_response(query.question)}
