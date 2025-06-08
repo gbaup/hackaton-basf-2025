@@ -7,8 +7,10 @@ from app.rag_system.rag_engine import query_index
 
 def risk_evaluation(contents: bytes, content_type: str, zona: str):
     detected_classes = ghs_labels_detection(contents, content_type)
+    print(f"⚠️  Clases detectadas: {detected_classes}", flush=True)
     historial_context = obtener_historial_por_zona(zona)
     responses = {}
+    print("🧠 Evaluando riesgo contextualizado con OpenAI...", flush=True)
     for detected_class in detected_classes:
         ghs_chunks = query_index(detected_class)
 
@@ -24,4 +26,5 @@ def risk_evaluation(contents: bytes, content_type: str, zona: str):
         response = evaluar_riesgo(mensaje)
         responses[detected_class] = response
 
+    print(f"✅ Evaluación de riesgos completada!")
     return {"zona": zona, "resultados": responses}

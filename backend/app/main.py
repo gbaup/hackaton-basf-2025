@@ -15,6 +15,7 @@ def read_root():
 @app.post("/predict-risks")
 async def predict(file: UploadFile = File(...), zona: str = Form(...)):
     contents = await file.read()
+    print("❗️ Imagen recibida", flush=True)
     try:
         return risk_evaluation(contents, file.content_type, zona)
     except Exception:

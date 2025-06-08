@@ -11,6 +11,7 @@ collection = db["historial_mantenimientos"]
 
 
 def obtener_historial_por_zona(zona: str):
+    print(f"🗂️  Obteniendo historial de la zona: {zona}", flush=True)
     registros = collection.find({"sector": f"zona_{zona}"})
     historial = []
     for reg in registros:
