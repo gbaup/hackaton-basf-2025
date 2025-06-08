@@ -15,11 +15,25 @@ if uploaded_file:
             response = requests.post("http://api:8000/predict-risks", files=files)
 
             st.subheader("🔍 Evaluación del riesgo:")
-            try:
-                st.json(response.json())
-            except:
-                st.write("Respuesta (no JSON):")
-                st.text(response.text)
+
+            data = response.json()
+            if "resultados" in data:
+                for clase, resultado in data["resultados"].items():
+                    st.markdown(f"### 🛑 Pictograma detectado: `{clase}`")
+                    if isinstance(resultado, dict):
+                        st.write(f"**Riesgo estimado:** {resultado.get('riesgo_estimado', 'N/A')}")
+                        st.write("**Motivos:**")
+                        for motivo in resultado.get("motivos", []):
+                            st.markdown(f"- {motivo}")
+                        sugerencias = resultado.get("sugerencias")
+                        if sugerencias:
+                            st.write("**Sugerencias:**")
+                            for sugerencia in sugerencias:
+                                st.markdown(f"- {sugerencia}")
+                    else:
+                        st.warning(resultado)
+            else:
+                st.json(data)
 
             status.update(label="✅ Evaluación completada", state="complete")
 
